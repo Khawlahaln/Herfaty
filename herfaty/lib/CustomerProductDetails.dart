@@ -8,6 +8,7 @@ import 'package:herfaty/constants/color.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:herfaty/widgets/ExpandedWidget.dart';
 
+//DB note: The only way to check if a document exists is to try to read it :)
 class CustomerProdectDetails extends StatefulWidget {
   final Product1 product;
   String detailsImage;
@@ -21,12 +22,27 @@ class CustomerProdectDetails extends StatefulWidget {
 
 class _CustomerProdectDetailsState extends State<CustomerProdectDetails> {
   int updatedQuantity = 1;
+  bool documentEistesInCart = true;
+
+  // @override
+  // initState() {
+  //   super.initState();
+  //   isExistIncart(widget.product.id);
+  //   if (!documentEistesInCart) {
+  //     updatedQuantity = 1;
+  //   }
+  // }
+
   @override
   Widget build(BuildContext context) {
     final FirebaseAuth auth = FirebaseAuth.instance;
     final User? user = auth.currentUser;
     //////////////////////////////////////////////////////////////////////////////////////////
 
+    isExistIncart(widget.product.id);
+    if (!documentEistesInCart) {
+      updatedQuantity = 1;
+    }
     //////////////////////////////////////////////////////////////////////////////////////
     Size size = MediaQuery.of(context).size;
     return Scaffold(
@@ -291,6 +307,42 @@ class _CustomerProdectDetailsState extends State<CustomerProdectDetails> {
     );
   }
 
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //Check if a document exists in the cart (so we should retrieve its quantity and update it)
+  Future isExistIncart(String id) async {
+    var a = await FirebaseFirestore.instance.collection('cart').doc(id).get();
+    if (a.exists) {
+      print('Exists');
+      documentEistesInCart = true;
+      print(documentEistesInCart);
+      updatWithExistedQuantity(id);
+    }
+    if (!a.exists) {
+      documentEistesInCart = false;
+      print('Not exists');
+    }
+  }
+  //......................................................................
+  //retrieve quantiy field from the existig ducument
+
+  Future updatWithExistedQuantity(String id) async {
+    String DocId = id;
+    DocumentSnapshot documentSnapshot;
+    await FirebaseFirestore.instance
+        .collection('cart')
+        .doc(DocId)
+        .get()
+        .then((value) {
+      documentSnapshot = value; // we get the document here
+      updatedQuantity = documentSnapshot['quantity'];
+      print(updatedQuantity);
+    });
+    return updatedQuantity;
+    //now you can access the document field value
+  }
+
+  //....................................................................
   Future createCartItem(AddProductToCart cartItem) async {
     final docCartItem = FirebaseFirestore.instance
         .collection('cart')
@@ -302,6 +354,7 @@ class _CustomerProdectDetailsState extends State<CustomerProdectDetails> {
     );
   }
 
+//...........................................................................
   Future updateProductAvailableAmount(AddProductToCart cartItem) async {
     final docCartItem = FirebaseFirestore.instance
         .collection('Products')
