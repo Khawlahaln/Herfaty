@@ -1,43 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:herfaty/CustomerProductDetails.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:herfaty/CustomerProducts/CustomerProductDetails.dart';
 import 'package:herfaty/constants/size.dart';
-import 'package:herfaty/productCard.dart';
-import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:herfaty/CustomerProducts/productCard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:herfaty/Product1.dart';
-import 'package:herfaty/screens/customer_base_screen.dart';
+import 'package:herfaty/CustomerProducts/Product1.dart';
+import 'package:herfaty/constants/color.dart';
+import 'package:herfaty/constants/icons.dart';
 
-import 'constants/color.dart';
-import 'constants/icons.dart';
-
-class CustomerProductsList extends StatelessWidget {
+class OwnerProductsList extends StatelessWidget {
   String categoryName;
 
-  CustomerProductsList({
+  OwnerProductsList({
     required categoryName,
     Key? key,
   })  : this.categoryName = categoryName,
         super(key: key);
-  //variable to store the category name from categories page
-
+  //category name is a variable to store the category name from categories page
   //  صفحة عائشة ترسل لي هنا اسم الفئة بناء عليه أعرض المنتجات
-  Stream<List<Product1>> readPrpducts() => FirebaseFirestore.instance
-      .collection('Products')
-      .where("categoryName", isEqualTo: categoryName)
-      .snapshots()
-      .map((snapshot) =>
-          snapshot.docs.map((doc) => Product1.fromJson(doc.data())).toList());
-
   //======================================================================================
+
   @override
   Widget build(BuildContext context) {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final User? user = auth.currentUser;
+    String thisOwnerId = user!.uid;
+    //...............................................
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: productsListAppBar(context),
-      //bottomNavigationBar: navMethod(), // the new nav need tap change page
-      //NavigationBar(), // the old nav
-      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      //..........................................................................................
       body: SafeArea(
         child: Column(
           children: [
@@ -48,7 +40,7 @@ class CustomerProductsList extends StatelessWidget {
                 children: [
                   //This is to list all of our items fetched from the DB========================
                   StreamBuilder<List<Product1>>(
-                    stream: readPrpducts(),
+                    stream: readPrpducts(thisOwnerId),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
@@ -95,7 +87,18 @@ class CustomerProductsList extends StatelessWidget {
     );
   }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //=====================================================================================
+  Stream<List<Product1>> readPrpducts(String thisOwnerId) => FirebaseFirestore
+      .instance
+      .collection('Products')
+      .where("categoryName", isEqualTo: categoryName)
+      .where("shopOwnerId", isEqualTo: thisOwnerId)
+      .snapshots()
+      .map((snapshot) =>
+          snapshot.docs.map((doc) => Product1.fromJson(doc.data())).toList());
+
+  //======================================================================================
+//////////////////////////////////////////////////////////////////////////////////////////////
   //AppBar
   AppBar productsListAppBar(var context) {
     return AppBar(
