@@ -139,6 +139,16 @@ class _ratingsListState extends State<ratingsList> {
                         } else if (snapshot.hasData) {
                           final ratings = snapshot.data!.toList();
                           final data = snapshot.data!;
+                          //sort the products according to date
+                          ratings.sort((a, b) {
+                            return DateTime.parse(b.dateTime)
+                                .compareTo(DateTime.parse(a.dateTime));
+                          });
+                          // ratings.sort((a, b) {
+                          //   return DateTime.parse(b.time)
+                          //       .compareTo(DateTime.parse(a.time));
+                          // });
+
                           if (data.isEmpty) {
                             return const Center(
                               child: Text(

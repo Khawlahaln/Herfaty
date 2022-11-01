@@ -1,6 +1,6 @@
 class ratingModel {
   double starsNumber = 0;
-  String orderId = "", shopOwnerId = "", comment = "", date = "", time = "";
+  String orderId = "", shopOwnerId = "", comment = "", date = "", dateTime = "";
 
   ratingModel({
     required this.starsNumber,
@@ -8,7 +8,7 @@ class ratingModel {
     required this.orderId,
     required this.comment,
     required this.date,
-    required this.time,
+    required this.dateTime,
   });
 
   ratingModel.fromJson(Map<String, dynamic> json) {
@@ -17,7 +17,7 @@ class ratingModel {
     orderId = json['orderId'];
     comment = json['comment'];
     date = json['date'];
-    time = json['time'];
+    dateTime = json['dateTime'];
   }
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
@@ -26,7 +26,7 @@ class ratingModel {
     data['orderId'] = this.orderId;
     data['comment'] = this.comment;
     data['date'] = this.date;
-    data['time'] = this.time;
+    data['dateTime'] = this.dateTime;
     return data;
   }
 }

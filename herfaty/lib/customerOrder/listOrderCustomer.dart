@@ -1150,7 +1150,9 @@ class _listOrderCustomerState extends State<listOrderCustomer> {
       onSubmitted: (response) async {
         //get current date and time firstly
         String cdate = DateFormat("yyyy-MM-dd").format(DateTime.now());
-        String ctime = DateFormat("HH:mm:ss").format(DateTime.now());
+        String cdateTime =
+            DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
+
         String commentToBeStored;
         if (response.comment == "") {
           commentToBeStored = "بدون تعليق";
@@ -1163,7 +1165,7 @@ class _listOrderCustomerState extends State<listOrderCustomer> {
             orderId: orderId,
             comment: commentToBeStored,
             date: cdate,
-            time: ctime);
+            dateTime: cdateTime);
         createRatingItem(item);
         await showToastMethod(context, "شكرًا، تم إرسال تقييمك");
         //..........................................................................
